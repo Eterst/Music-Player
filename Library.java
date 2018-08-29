@@ -12,6 +12,7 @@ import javax.swing.JFileChooser;
  * @author Rodolfo
  *
  */
+
 public class Library 
 {
 	/**
@@ -32,8 +33,8 @@ public class Library
 	{
 		library = new Track[100];
 		nextTrack = 0;
-		File saveroot = new File("C:\\Users\\usuario\\Desktop\\playthis");
-		File savefile = new File("C:\\Users\\usuario\\Desktop\\playthis\\filename.txt");
+		File saveroot = new File("biblioteca");
+		File savefile = new File("biblioteca\\library.txt");
 		if(!saveroot.exists()){
 			try {
 				saveroot.mkdir();
@@ -48,7 +49,7 @@ public class Library
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}else {
+		}else if(savefile.exists()) {
 			loadLibrary();
 		}
 		
@@ -60,9 +61,30 @@ public class Library
 	 */
 	public void loadLibrary()
 	{
-		String SaveLib = ReadFile("C:\\Users\\usuario\\Desktop\\playthis\\filename.txt"); //Modificar ruta dejando \\playthis\\filename.txt
+		String localroot = "biblioteca\\library.txt";
+		String SaveLib = ReadFile(localroot); //Modificar ruta dejando \\playthis\\filename.txt
+		File file = new File(localroot);
 		String[] song = SaveLib.split("\n");
-		//Under construction
+		String cache = "";
+		int i = 0;
+			try {
+				FileReader fr = new FileReader(file);
+				BufferedReader br = new BufferedReader(fr);
+				while(true) {
+					cache=br.readLine();
+					if(cache!= null) {
+						addToLibrary(song[i]);
+						i++;
+					}
+					else {
+						break;
+					}
+				}
+				br.close();
+				fr.close();
+			}catch (Exception e) {
+				 e.printStackTrace();
+			 }
 		// TODO
 	}
 	
@@ -118,7 +140,28 @@ public class Library
 	 * @param trackFile
 	 */
 	private void addToLibrary(String trackString) {
-		//Under construction
+		String cache = trackString;
+		if(nextTrack == library.length)
+		{
+			// Cada vez que tenemos que agrandar la biblioteca, agregamos 100 espacios mas
+			Track[] newLibrary = new Track[library.length + 100];
+			for(int i = 0; i < library.length; ++i)
+			{
+				// Movemos una por una las canciones que estan almacenadas en la biblioteca actual, hacia la nueva biblioteca
+				// Se estan pasando las canciones por referencia, eso significa que no se estan copiando (no se esta haciendo memoria nueva para cada cancion independiente)
+				newLibrary[i] = library[i];
+			}
+			// Reemplazamos la biblioteca actual por la nueva biblioteca
+			library = newLibrary;
+		}
+		String[] atributtes = cache.split("&&");
+		int temp_trackNo = Integer.parseInt(atributtes[0]);
+		String temp_artist = atributtes[1];
+		String temp_album = atributtes[2];
+		String temp_tittle = atributtes[3];
+		String temp_path = atributtes[4];
+		Track temp_Track = new Track(temp_tittle, temp_album, temp_artist, temp_trackNo, temp_path);
+		library[nextTrack++] = temp_Track;
 	}
 	private void addToLibrary(File trackFile)
 	{
@@ -141,8 +184,7 @@ public class Library
 		// Notese el uso del ++ y el uso del constructor de canciones que ya hace todo solo
 		library[nextTrack++] = new Track(trackFile);
 		Track Tcache = new Track(trackFile);
-		System.out.println("Here: "+Tcache.getTitle());
-		String save = Tcache.getTrackNo()+"|"+Tcache.getArtist()+"|"+Tcache.getAlbum()+"|"+Tcache.getTitle()+"|"+Tcache.getPath();
+		String save = Tcache.getTrackNo()+"&&"+Tcache.getArtist()+"&&"+Tcache.getAlbum()+"&&"+Tcache.getTitle()+"&&"+Tcache.getPath();
 		WriteFile(save);
 	}
 	
@@ -151,7 +193,7 @@ public class Library
 	 */
 	// Metodos de crear y leer archivo txt
 	public void WriteFile(String message) {
-		File file = new File("C:\\Users\\usuario\\Desktop\\playthis\\filename.txt");//Modificar ruta dejando \\playthis\\filename.txt
+		File file = new File("biblioteca\\library.txt");//Modificar ruta dejando \\playthis\\filename.txt
 		try {
 			if (!file.exists()) {
 				 file.createNewFile();
@@ -175,8 +217,8 @@ public class Library
 		 return cache;
 	}
 	public static String ReadFile(String fileroot) {
-		//File file = new File("C:\\Users\\usuario\\Desktop\\playthis\\filename.txt");
-		File file = new File(fileroot);
+		File file = new File("biblioteca\\library.txt");
+		//File file = new File(fileroot);
 		String text = "";
 		String cache = "";
 		try {

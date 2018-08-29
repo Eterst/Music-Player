@@ -19,6 +19,13 @@ public class Track {
 	 * 
 	 * @param file contiene la referencia al archivo que tiene la cancion
 	 */
+	public Track(String title, String album, String artist, int trackNo, String path) {
+		this.trackNo = trackNo;
+		this.artist = artist;
+		this.album = album;
+		this.title = title;
+		this.file = new File(path);
+	}
 	public Track(File file)
 	{
 		//System.out.println(file.getAbsolutePath());
